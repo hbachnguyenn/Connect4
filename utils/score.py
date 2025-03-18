@@ -1,99 +1,89 @@
 import math
 
-
-def count_consecutive_moves_in_line(contents: [bool]):
-    red = [0, 0, 0, 0]
-    yellow = [0, 0, 0, 0]
+def count_consecutive_tokens_in_line(board: [[bool | None]], start: tuple[int, int],
+                                     red: int, yellow: int, direction: tuple[int, int],
+                                     count_token = False) -> tuple[int, int]:
+    row, col = start
     previous = None
-    streak = 0
-    for index, i in enumerate(contents):
-        if i is True:
-            red[0] += 1
-        if i is False:
-            yellow[0] += 1
+    streak = 1
 
-        if i != previous:
-            if streak > 1:
-                if previous is True:
-                    red[streak - 1] += 1
-                elif previous is False:
-                    yellow[streak - 1] += 1
-            streak = 1
+    while 0 <= row < len(board) and 0 <= col < len(board[0]):
+        print(row, col, board[row][col])
+
+
+        cur_token = board[row][col]
+        if count_token:
+            if cur_token is True:
+                red += 1
+            if cur_token is False:
+                yellow += 1
+
+        if cur_token == previous and streak < 4:
+            streak += 1
         else:
-            if streak < 4:
-                streak += 1
-        if index == len(contents) - 1 and streak > 1:
-            if previous is True:
-                red[streak - 1] += 1
-            elif previous is False:
-                yellow[streak - 1] += 1
+            if streak > 1 and previous is not None:
+                score = int(math.pow(10, streak - 1))
+                (red, yellow) = (red + score, yellow) if previous else (
+                    red, yellow + score)
+                print(streak)
+                print(score)
+            streak = 1
 
-        previous = i
+        if (direction == (0, 1) and col == len(board[0]) - 1) or (direction == (1, 0) and row == len(board) - 1)\
+                or ((direction == (1, 1)) and ((row == len(board) - 1) or (col == len(board[0]) - 1))) \
+                or ((direction == (-1, 1)) and ((row == 0) or (col == len(board[0]) - 1))):
 
+            if streak > 1 and previous is not None:
+                score = int(math.pow(10, streak - 1))
+                print("HERE")
+                (red, yellow) = (red + score, yellow) if previous else (
+                    red, yellow + score)
+
+
+        previous = cur_token
+        row += direction[0]
+        col += direction[1]
+
+    print(red, yellow)
+    print()
     return red, yellow
 
 
-def calculate_score_in_line(red: [int], yellow: [int]):
-    i = 0
-    red_score = 0
-    yellow_score = 0
-    while i < 4:
-        multiplier = int(math.pow(10, i))
-        red_score += red[i] * multiplier
-        yellow_score += yellow[i] * multiplier
-        i += 1
-    return red_score, yellow_score
+def evaluate_initial_board(board: [[bool | None]]):
+    red = 0
+    yellow = 0
+    directions = [(0, 1), (1, 1), (1, 0), (1, -1)]
 
+    # Loop through the first row + evaluate all lines pass through these points + count the number of points
+    for col in range(len(board[0])):
+        red, yellow = count_consecutive_tokens_in_line(board, (0, col), red, yellow, directions[2], True)
+        if col != 6:
+            red, yellow = count_consecutive_tokens_in_line(board, (0, col), red, yellow, directions[1])
+        if col != 0:
+            red, yellow = count_consecutive_tokens_in_line(board, (0, col), red, yellow, directions[3])
 
-MAPPING = {'R': 1, 'Y': 2}
+    print("Start row")
+    for row in range(len(board)):
+        red, yellow = count_consecutive_tokens_in_line(board, (row, 0), red, yellow, directions[0])
+        if row != 0:
+            red, yellow = count_consecutive_tokens_in_line(board, (row, 0), red, yellow, directions[1])
 
+    for row in range(len(board)):
+        if row != 0 and row != 5:
+            red, yellow = count_consecutive_tokens_in_line(board, (row, 6), red, yellow, directions[3])
 
-def parse_board(board):
-    board = board.split(',')
-    for i in range(len(board)):
-        ls = list(board[i])
-        for j in range(len(ls)):
-            if ls[j] == 'r':
-                ls[j] = 1
-            elif ls[j] == 'y':
-                ls[j] = 2
-            else:
-                ls[j] = 0
-        board[i] = ls
-    return board
+    return red, yellow
 
+initial_board =     [[None, None, False, False, True, True, True],
+                     [None, None, True, False, True, False, True],
+                     [None, None, None, None, False, None, None],
+                     [None, None, None, None, None, None, None],
+                     [None, None, None, None, None, None, None],
+                     [None, None, None, None, None, None, None]]
 
-def is_valid(row, col):
-    return 0 <= row < 6 and 0 <= col < 7
+for i in reversed(range(len(initial_board))):
+    print(initial_board[i])
 
-
-def initial_board_evaluation(board, player):
-    directions = [(0, 1), (1, 0), (1, 1), (1, -1)]  # right, down, diag top right, diag top left
-    rows, cols = len(board), len(board[0])
-    counts = {2: 0, 3: 0, 4: 0}
-
-    for row in range(rows):
-        for col in range(cols):
-            if board[row][col] != player:
-                continue
-
-            for dr, dc in directions:
-                # either left, down, diag bot l r is the same player then alr counted
-                prev_r, prev_c = row - dr, col - dc
-                if is_valid(prev_r, prev_c) and board[prev_r][prev_c] == player:
-                    continue
-
-                length = 1
-                r, c = row + dr, col + dc
-                while is_valid(r, c) and board[r][c] == player:
-                    length += 1
-                    r += dr
-                    c += dc
-
-                if length >= 4:
-                    counts[4] += 1
-                elif length == 3:
-                    counts[3] += 1
-                elif length == 2:
-                    counts[2] += 1
-    return counts
+red_score, yellow_score = evaluate_initial_board(initial_board)
+print("RED: ", red_score)
+print("YELLOW: ", yellow_score)

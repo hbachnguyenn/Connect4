@@ -35,7 +35,6 @@ def count_consecutive_tokens_in_line(board: [[bool | None]], start: tuple[int, i
 
             if streak > 1 and previous is not None:
                 score = int(math.pow(10, streak - 1))
-                print("HERE")
                 (red, yellow) = (red + score, yellow) if previous else (
                     red, yellow + score)
 
@@ -62,7 +61,6 @@ def evaluate_initial_board(board: [[bool | None]]):
         if col != 0:
             red, yellow = count_consecutive_tokens_in_line(board, (0, col), red, yellow, directions[3])
 
-    print("Start row")
     for row in range(len(board)):
         red, yellow = count_consecutive_tokens_in_line(board, (row, 0), red, yellow, directions[0])
         if row != 0:

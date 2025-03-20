@@ -1,45 +1,39 @@
-class Board:
-    row: [[bool | None]]
-    col: [[bool | None]]
-    diagonal_top_left: [[bool | None]]
-    diagonal_top_right: [[bool | None]]
+## Board function
+initial_board =     [[None, None, False, False, True, True, True],
+                     [None, None, True, False, True, False, True],
+                     [None, None, None, None, False, None, None],
+                     [None, None, None, None, None, None, None],
+                     [None, None, None, None, None, None, None],
+                     [None, None, None, None, None, None, None]]
 
-    def __init__(self, board: [[bool | None]]):
-        self.row = board
+def get_next_moves(board: [[bool | None]]) -> [tuple[int, int]]:
+    next_moves = []
+    for col in range(len(board[0])):
+        for row in range(len(board)):
+            if board[row][col] is None:
+                next_moves.append((row, col))
+                break
+    return next_moves
 
-    def wide_to_long(self):
-        if self.row:
-            self.col = [[] for i in range(7)]
-            i = 0
-            while i < len(self.row):
-                j = 0
-                while j < len(self.row[i]):
-                    self.col[j].append(self.row[i][j])
-                    j += 1
-                i += 1
-        print(self.col)
+def perform_next_move(board: [[bool | None]], location: tuple[int, int], turn: bool) -> None:
+    board[location[0]][location[1]] = turn
 
-    def wide_to_diagonal_top_right(self):
-        if self.row:
-            self.diagonal_top_right = [[] for i in range(12)]
-            self.diagonal_top_left = [[] for i in range(12)]
-            i = 0
-            while i < len(self.row):
-                j = 0
-                while j < len(self.row[i]):
-                    self.diagonal_top_right[5 - i + j].append(self.row[i][j])
-                    self.diagonal_top_left[5 - i + j].append(self.row[5 - i][j])
-                    j += 1
-                i += 1
-        print(self.diagonal_top_right)
-        print(self.diagonal_top_left)
+def undo_move(board: [[bool | None]], location: tuple[int, int]) -> None:
+    board[location[0]][location[1]] = None
 
-board = [[False, False, True, False, None, True, True],
-         [True, False, True, False, None, True, True],
-         [True, False, True, False, None, True, True],
-         [True, False, True, False, None, True, True],
-         [False, False, True, False, None, True, True],
-         [False, None, True, False, None, True, True]]
+def generate_next_board(board: [[bool | None]]):
+    next_moves = get_next_moves(board)
+    for location in next_moves:
+        print(location)
+        perform_next_move(board, location, turn=True)
+        display_board(board)
+        undo_move(board, location)
 
-a = Board(board)
-a.wide_to_diagonal_top_right()
+def display_board(board: [[bool | None]]) -> None:
+    for row in range(len(board)):
+        for col in range(len(board[0])):
+            print(board[5-row][col], end="\t")
+        print()
+
+if __name__ == '__main__':
+    generate_next_board(initial_board)

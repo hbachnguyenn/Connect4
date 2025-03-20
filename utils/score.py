@@ -70,13 +70,13 @@ def is_valid(row, col):
 def initial_board_evaluation(board, player):
     directions = [(0, 1), (1, 0), (1, 1), (1, -1)]  # right, down, diag top right, diag top left
     rows, cols = len(board), len(board[0])
-    counts = {1: 0, 2: 0, 3: 0, 4: 0}
+    counts = {2: 0, 3: 0, 4: 0}
 
     for row in range(rows):
         for col in range(cols):
             if board[row][col] != player:
                 continue
-            counts[1] += 1
+
             for dr, dc in directions:
                 # either left, down, diag bot l r is the same player then alr counted
                 prev_r, prev_c = row - dr, col - dc
@@ -97,7 +97,3 @@ def initial_board_evaluation(board, player):
                 elif length == 2:
                     counts[2] += 1
     return counts
-
-#
-# c = initial_board_evaluation(parse_board("..yyrrr,..rryrr,....y..,.......,.......,......."), MAPPING['R'])
-# print(c)

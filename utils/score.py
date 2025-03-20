@@ -72,16 +72,16 @@ def evaluate_initial_board(board: [[bool | None]]):
 
     return red, yellow
 
-initial_board =     [[None, None, False, False, True, True, True],
-                     [None, None, True, False, True, False, True],
-                     [None, None, None, None, False, None, None],
-                     [None, None, None, None, None, None, None],
-                     [None, None, None, None, None, None, None],
-                     [None, None, None, None, None, None, None]]
-
-for i in reversed(range(len(initial_board))):
-    print(initial_board[i])
-
-red_score, yellow_score = evaluate_initial_board(initial_board)
-print("RED: ", red_score)
-print("YELLOW: ", yellow_score)
+# initial_board =     [[None, None, False, False, True, True, True],
+#                      [None, None, True, False, True, False, True],
+#                      [None, None, None, None, False, None, None],
+#                      [None, None, None, None, None, None, None],
+#                      [None, None, None, None, None, None, None],
+#                      [None, None, None, None, None, None, None]]
+#
+# for i in reversed(range(len(initial_board))):
+#     print(initial_board[i])
+#
+# red_score, yellow_score = evaluate_initial_board(initial_board)
+# print("RED: ", red_score)
+# print("YELLOW: ", yellow_score)

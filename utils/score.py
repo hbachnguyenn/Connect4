@@ -29,9 +29,9 @@ def count_consecutive_tokens_in_line(board: [[bool | None]], start: tuple[int, i
                 print(score)
             streak = 1
 
-        if (direction == (0, 1) and col == len(board[0]) - 1) or (direction == (1, 0) and row == len(board) - 1)\
+        if ((direction == (0, 1) and col == len(board[0]) - 1) or (direction == (1, 0) and row == len(board) - 1)\
                 or ((direction == (1, 1)) and ((row == len(board) - 1) or (col == len(board[0]) - 1))) \
-                or ((direction == (-1, 1)) and ((row == 0) or (col == len(board[0]) - 1))):
+                or ((direction == (-1, 1)) and ((row == 0) or (col == len(board[0]) - 1)))):
 
             if streak > 1 and previous is not None:
                 score = int(math.pow(10, streak - 1))

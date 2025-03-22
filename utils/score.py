@@ -8,7 +8,7 @@ def count_consecutive_tokens_in_line(board: [[bool | None]], start: tuple[int, i
     streak = 1
 
     while 0 <= row < len(board) and 0 <= col < len(board[0]):
-        print(row, col, board[row][col])
+        # print(row, col, board[row][col])
 
 
         cur_token = board[row][col]
@@ -25,8 +25,8 @@ def count_consecutive_tokens_in_line(board: [[bool | None]], start: tuple[int, i
                 score = int(math.pow(10, streak - 1))
                 (red, yellow) = (red + score, yellow) if previous else (
                     red, yellow + score)
-                print(streak)
-                print(score)
+                # print(streak)
+                # print(score)
             streak = 1
 
         if ((direction == (0, 1) and col == len(board[0]) - 1) or (direction == (1, 0) and row == len(board) - 1)\
@@ -43,8 +43,8 @@ def count_consecutive_tokens_in_line(board: [[bool | None]], start: tuple[int, i
         row += direction[0]
         col += direction[1]
 
-    print(red, yellow)
-    print()
+    # print(red, yellow)
+    # print()
     return red, yellow
 
 

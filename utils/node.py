@@ -1,10 +1,8 @@
 class Node:
-    def __init__(self, parent, evaluation: int | None, turn: bool):
-        self.turn = turn
+    def __init__(self, evaluation: int | None):
         self.alpha = - float("inf")
         self.beta = float("inf")
         self.evaluation = evaluation
-        self.parent = parent
         self.children = []
 
     def set_alpha(self, alpha: int):
@@ -22,11 +20,8 @@ class Node:
     def get_beta(self):
         return self.beta
 
-    def get_turn(self):
-        return self.turn
-
-    def get_parent(self):
-        return self.parent
+    # def get_turn(self):
+    #     return self.turn
 
     def get_evaluation(self):
         return self.evaluation

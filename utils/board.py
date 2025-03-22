@@ -25,3 +25,6 @@ class Board:
             for col in range(len(self.board[0])):
                 print(self.board[5-row][col], end="\t")
             print()
+
+    def get_board(self):
+        return self.board

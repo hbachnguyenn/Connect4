@@ -10,10 +10,28 @@ class Tree:
         self.turn = True if turn == 'red' else False
         self.board = Board(contents)
         self.max_depth = max_depth
-        self.root = Node(None)  # Root node
+        self.root = Node(None, self.turn, -1)  # Root node
+        self.nodes_examined = 0
+
+    def minimax(self, node, depth, max_depth, turn) -> Node:
+        if node.won:
+            node.evaluation = 10000 if node.turn else -10000
+            return node
+
+        if depth == max_depth:
+            return node
+        # red
+        evaluation_value = [self.minimax(child, depth + 1, max_depth, turn) for child in node.children]
+        if not evaluation_value:
+            return node
+        self.nodes_examined += len(evaluation_value)
+        if turn:
+            return max(evaluation_value)
+        else:
+            return min(evaluation_value)
+
 
     def generate_state_space_tree(self):
-        """ Always starts tree generation from the root node. """
         self.expand_tree(self.root, 0)  # Always start from root
 
     def expand_tree(self, node, depth):
@@ -27,28 +45,26 @@ class Tree:
 
             evalu = None
             if depth == self.max_depth - 1:
-                idx = 1 if self.turn else 0
-                evalu = score.evaluate_initial_board(board)[idx]
+                red = score.evaluate_initial_board(board, True)
+                yellow = score.evaluate_initial_board(board, False)
+                evalu = -1 if red == -1 or yellow == -1 else red - yellow
 
             # add child
-            child = Node(evalu)
+            child = Node(evalu, False if self.turn else True, move[1])
+            if evalu == -1:  # win
+                child.won = True
+                node.add_child(child)
+                return
             node.add_child(child)
 
-            # self.board.display_board()
-
-            # backtrack
             self.turn = False if self.turn else True
             self.expand_tree(child, depth + 1)
-
+            # backtrack
             self.turn = False if self.turn else True
             self.board.undo_move(move)
 
-
-    def traverse(self, node=None):
-        pass
-
     def display_tree(self, node, prefix="-"):
-        print(prefix + str(node.evaluation))
+        print(prefix + f"({node.evaluation})")
         for child in node.children:
             self.display_tree(child, prefix + prefix)
 

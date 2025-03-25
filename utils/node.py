@@ -36,9 +36,3 @@ class Node:
 
     def get_children(self):
         return self.children
-
-    def __gt__(self, other):
-        return self.evaluation > other.evaluation
-
-    def __lt__(self, other):
-        return self.evaluation < other.evaluation

@@ -22,16 +22,13 @@ class Tree:
         return Node(evaluation, self.turn, 0)
 
     def minimax(self, node, depth, max_depth, turn) -> Node:
-        if node.is_terminated():
+        if node.is_terminated() or depth == max_depth:
             return node
 
-        if depth == max_depth:
+        if not node.get_children():
             return node
 
-        child_node = [self.minimax(child, depth + 1, max_depth, turn) for child in node.children]
-
-        if not child_node:
-            return node
+        child_node = [self.minimax(child, depth + 1, max_depth, not turn) for child in node.children]
 
         self.nodes_examined += len(child_node)
         selected_node = child_node[0]
@@ -63,8 +60,7 @@ class Tree:
             self.expand_tree(child, depth + 1)
             self.board.undo_move(move)
 
-    def display_tree(self, node, prefix="-"):
-        print(prefix + f"({node.evaluation})" + f" ({node.col})")
+    def display_tree(self, node, prefix=" " * 8, start_depth = 0):
+        print(f"{start_depth} " + prefix + f"({node.get_evaluation()})" + f"\t({node.get_col()})" + f"\t({node.get_turn()})")
         for child in node.children:
-            self.display_tree(child, prefix + prefix)
-
+            self.display_tree(child, prefix + " " * 8, start_depth + 1)

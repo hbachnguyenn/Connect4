@@ -1,11 +1,10 @@
 class Node:
-    def __init__(self, evaluation: int | None, turn: bool, col: int):
+    def __init__(self, evaluation: int, turn: bool, col: int):
         self.alpha = - float("inf")
         self.beta = float("inf")
         self.evaluation = evaluation
         self.turn = turn
         self.col = col
-        self.won = False
         self.children = []
 
     def set_alpha(self, alpha: int):
@@ -29,8 +28,8 @@ class Node:
     def get_col(self):
         return self.col
 
-    def get_won(self):
-        return self.won
+    def is_terminated(self):
+        return self.evaluation == 10000 or self.evaluation == -10000
 
     def get_evaluation(self):
         return self.evaluation

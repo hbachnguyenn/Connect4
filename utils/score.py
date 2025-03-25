@@ -1,114 +1,121 @@
 import math
-
-# def count_consecutive_tokens_in_line(board: [[bool | None]], start: tuple[int, int],
-#                                      red: int, yellow: int, direction: tuple[int, int],
-#                                      count_token = False) -> tuple[int, int, bool | None]:
-#     row, col = start
-#     previous = None
-#     streak = 1
-#     is_win = False
-#
-#     while 0 <= row < len(board) and 0 <= col < len(board[0]):
-#         is_win = None
-#         cur_token = board[row][col]
-#         if count_token:
-#             if cur_token is True:
-#                 red += 1
-#             if cur_token is False:
-#                 yellow += 1
-#
-#         if cur_token == previous and streak < 4:
-#             streak += 1
-#             if streak == 4:
-#                 is_win = True
-#                 break
-#
-#         else:
-#             if streak > 1 and previous is not None:
-#                 score = int(math.pow(10, streak - 1))
-#                 (red, yellow) = (red + score, yellow) if previous else (
-#                     red, yellow + score)
-#                 # print(streak)
-#                 # print(score)
-#             streak = 1
-#
-#         if ((direction == (0, 1) and col == len(board[0]) - 1) or (direction == (1, 0) and row == len(board) - 1)\
-#                 or ((direction == (1, 1)) and ((row == len(board) - 1) or (col == len(board[0]) - 1))) \
-#                 or ((direction == (-1, 1)) and ((row == 0) or (col == len(board[0]) - 1)))):
-#
-#             if streak > 1 and previous is not None:
-#                 score = int(math.pow(10, streak - 1))
-#                 (red, yellow) = (red + score, yellow) if previous else (
-#                     red, yellow + score)
-#
-#         previous = cur_token
-#         row += direction[0]
-#         col += direction[1]
-#
-#     # print(red, yellow)
-#     # print()
-#     return red, yellow, is_win
-#
-#
-# def evaluate_initial_board(board: [[bool | None]]):
-#     red = 0
-#     yellow = 0
-#     directions = [(0, 1), (1, 1), (1, 0), (1, -1)]
-#     won = False
-#
-#     # Loop through the first row + evaluate all lines pass through these points + count the number of points
-#     for col in range(len(board[0])):
-#         red, yellow, won = count_consecutive_tokens_in_line(board, (0, col), red, yellow, directions[2], True)
-#         if col != 6:
-#             red, yellow, _ = count_consecutive_tokens_in_line(board, (0, col), red, yellow, directions[1])
-#         if col != 0:
-#             red, yellow, _ = count_consecutive_tokens_in_line(board, (0, col), red, yellow, directions[3])
-#
-#     for row in range(len(board)):
-#         red, yellow, _ = count_consecutive_tokens_in_line(board, (row, 0), red, yellow, directions[0])
-#         if row != 0:
-#             red, yellow, _ = count_consecutive_tokens_in_line(board, (row, 0), red, yellow, directions[1])
-#
-#     for row in range(len(board)):
-#         if row != 0 and row != 5:
-#             red, yellow, _ = count_consecutive_tokens_in_line(board, (row, 6), red, yellow, directions[3])
-#
-#     return red, yellow,
+from typing import Any
 
 
-def is_valid(row, col):
-    return 0 <= row < 6 and 0 <= col < 7
+def count_streak_in_line(board: [[bool | None]], start: tuple[int, int], count_streak: [int], direction: tuple[int, int], count_token = False) -> tuple[bool, bool | None]:
+    row, col = start
+    previous = None
+    streak = 1
+
+    while -1 <= row <= len(board) and -1 <= col <= len(board[0]):
+        try:
+            cur_token = board[row][col]
+            # print(cur_token)
+            if count_token and cur_token is not None:
+                count_streak[0] += 1 if cur_token else -1
+            if cur_token == previous and streak < 4:
+                streak += 1
+            else:
+                if streak > 1 and previous is not None:
+                    count_streak[streak - 1] += 1 if previous else -1
+                    if streak == 4:
+                        return True, previous
+                streak = 1
+
+            previous = cur_token
+            row += direction[0]
+            col += direction[1]
+
+        except IndexError:
+            if streak > 1 and previous is not None:
+                count_streak[streak - 1] += 1 if previous else -1
+            return (True, previous) if streak == 4 and previous is not None else (False, None)
+
+    return False, None
+
+def evaluate_initial_board(board: [[bool | None]]) -> tuple[bool, list[int] | bool]:
+    streak = [0, 0, 0, 0]
+    directions = [(0, 1), (1, 1), (1, 0), (1, -1)]
+    ended = False
+
+    for col in range(len(board[0])):
+        ended, winner = count_streak_in_line(board, (0, col), streak, directions[2], True)
+        if ended: return ended, winner
+
+    for col in range(len(board[0]) - 1):
+        ended, winner = count_streak_in_line(board, (0, col), streak, directions[1])
+        if ended: return ended, winner
+
+    for col in range(len(board)):
+        ended, winner = count_streak_in_line(board, (0, col + 1), streak, directions[3])
+        if ended: return ended, winner
+
+    for row in range(len(board)):
+        ended, winner = count_streak_in_line(board, (row, 0), streak, directions[0])
+        if ended: return ended, winner
+
+    for row in range(len(board)):
+        ended, winner = count_streak_in_line(board, (row + 1, 0), streak, directions[1])
+        if ended: return ended, winner
+
+    for row in range(len(board)):
+        if row != 0 and row != 5:
+            ended, winner = count_streak_in_line(board, (row, 6), streak, directions[3])
+            if ended: return ended, winner
+
+    return ended, streak
+
+def update_evaluation_when_add_move(move: tuple[int, int], board: [[bool | None]], turn: bool) -> tuple[bool, list[int] | bool]:
+    directions = [(0, 1), (1, 1), (1, 0), (1, -1)]
+    streak = [0, 0, 0, 0]
+    ended = False
+
+    start = [(move[0], 0)]
+    min_x_y = min(move[0], move[1])
+    start.append((move[0] - min_x_y, move[1] - min_x_y))
+    start.append((0, move[1]))
+    total_x_y = move[0] + move[1]
+    start.append((0, total_x_y)) if total_x_y <= 6 else start.append((total_x_y - 6, 6))
+
+    # Compute streak on those 4 lines before making a move
+    for i in range(len(directions)):
+        count_streak_in_line(board, start[i], streak, directions[i],False)
+
+    # Reverse the value for subtraction
+    streak = [-1 * i for i in streak]
+    # make a move on the board
+    board[move[0]][move[1]] = turn
+
+    # Compute streak on those 4 lines after making a move
+    for i in range(len(directions)):
+        ended, winner = count_streak_in_line(board, start[i], streak, directions[i], False)
+        if ended: return ended, winner
+
+    streak[0] = 1 if turn else -1
+    return ended, streak
+
+def calculate_evaluation(streak: [int]):
+    evaluation = 0
+    for i in range(len(streak)):
+        evaluation += streak[i] * math.pow(10, i)
+    return int(evaluation)
 
 
-def evaluate_initial_board(board: [[bool | None]], player: bool):
-    directions = [(0, 1), (1, 0), (1, 1), (1, -1)]  # right, down, diag top right, diag top left
-    rows, cols = len(board), len(board[0])
-    counts = {1: 0, 2: 0, 3: 0, 4: 0}
 
-    for row in range(rows):
-        for col in range(cols):
-            if board[row][col] != player:
-                continue
-            counts[1] += 1
-            for dr, dc in directions:
-                # either left, down, diag bot l r is the same player then alr counted
-                prev_r, prev_c = row - dr, col - dc
-                if is_valid(prev_r, prev_c) and board[prev_r][prev_c] == player:
-                    continue
 
-                length = 1
-                r, c = row + dr, col + dc
-                while is_valid(r, c) and board[r][c] == player:
-                    length += 1
-                    r += dr
-                    c += dc
 
-                if length >= 4:
-                    counts[4] += 1
-                    return -1  # win
-                elif length == 3:
-                    counts[3] += 1
-                elif length == 2:
-                    counts[2] += 1
-    points = counts[1] + 10 * counts[2] + 100 * counts[3] + 1000 * counts[4]
-    return points
+
+# sample = [[None, None, False, False, True, True, True],
+#           [None, None, True, False, True, False, True],
+#           [None, None, None, None, False, None, None],
+#           [None, None, None, None, None, None, None],
+#           [None, None, None, None, None, None, None],
+#           [None, None, None, None, None, None, None]]
+
+
+
+
+
+
+
+

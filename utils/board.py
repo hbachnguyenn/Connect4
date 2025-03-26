@@ -1,45 +1,44 @@
+import utils.score as score
+from utils.node import Node
+
 class Board:
-    row: [[bool | None]]
-    col: [[bool | None]]
-    diagonal_top_left: [[bool | None]]
-    diagonal_top_right: [[bool | None]]
+    char_map = {"r": True, "y": False}
+    board: [[bool | None]]
 
-    def __init__(self, board: [[bool | None]]):
-        self.row = board
+    def __init__(self, contents: str):
+        self.board = [[self.char_map.get(char, None) for char in item] for item in contents.split(",")]
 
-    def wide_to_long(self):
-        if self.row:
-            self.col = [[] for i in range(7)]
-            i = 0
-            while i < len(self.row):
-                j = 0
-                while j < len(self.row[i]):
-                    self.col[j].append(self.row[i][j])
-                    j += 1
-                i += 1
-        print(self.col)
+    def get_next_moves(self) -> [tuple[int, int]]:
+        next_moves = []
+        for col in range(len(self.board[0])):
+            for row in range(len(self.board)):
+                if self.board[row][col] is None:
+                    next_moves.append((row, col))
+                    break
+        return next_moves
 
-    def wide_to_diagonal_top_right(self):
-        if self.row:
-            self.diagonal_top_right = [[] for i in range(12)]
-            self.diagonal_top_left = [[] for i in range(12)]
-            i = 0
-            while i < len(self.row):
-                j = 0
-                while j < len(self.row[i]):
-                    self.diagonal_top_right[5 - i + j].append(self.row[i][j])
-                    self.diagonal_top_left[5 - i + j].append(self.row[5 - i][j])
-                    j += 1
-                i += 1
-        print(self.diagonal_top_right)
-        print(self.diagonal_top_left)
+    def perform_next_move(self, position: tuple[int, int], parent: Node) -> Node:
+        result = score.update_evaluation_when_add_move(position, self.board, parent.turn)
+        if result[0]:
+            evaluation = 10000 if parent.turn else -10000
+        else:
+            evaluation = parent.get_evaluation() + score.calculate_evaluation(result[1])
+        node = Node(evaluation, not parent.turn, position[1])
+        parent.add_child(node)
+        return node
 
-board = [[False, False, True, False, None, True, True],
-         [True, False, True, False, None, True, True],
-         [True, False, True, False, None, True, True],
-         [True, False, True, False, None, True, True],
-         [False, False, True, False, None, True, True],
-         [False, None, True, False, None, True, True]]
+    def undo_move(self, location: tuple[int, int]) -> None:
+        self.board[location[0]][location[1]] = None
 
-a = Board(board)
-a.wide_to_diagonal_top_right()
+    def display_board(self) -> None:
+        for row in range(len(self.board)):
+            for col in range(len(self.board[0])):
+                print(self.board[5-row][col], end="\t")
+            print()
+        print()
+        print("---------------------------------------------------------")
+        print()
+
+
+    def get_board(self):
+        return self.board

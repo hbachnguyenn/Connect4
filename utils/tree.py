@@ -32,13 +32,19 @@ class Tree:
 
         self.nodes_examined += len(child_node)
         selected_node = child_node[0]
-        for i in child_node:
+        return_col = 0
+        for i in range(len(child_node)):
+            c_node = child_node[i]
             if turn:
-                if selected_node.get_evaluation() < i.get_evaluation():
-                    selected_node = i
+                if selected_node.get_evaluation() < c_node.get_evaluation():
+                    selected_node = c_node
+                    return_col = i
             else:
-                if selected_node.get_evaluation() > i.get_evaluation():
-                    selected_node = i
+                if selected_node.get_evaluation() > c_node.get_evaluation():
+                    selected_node = c_node
+                    return_col = i
+        if depth == 0:
+            selected_node.col = return_col
 
         return selected_node
 

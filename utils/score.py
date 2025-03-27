@@ -1,6 +1,4 @@
 import math
-from typing import Any
-
 
 def count_streak_in_line(board: [[bool | None]], start: tuple[int, int], count_streak: [int], direction: tuple[int, int], count_token = False) -> tuple[bool, bool | None]:
     row, col = start
@@ -77,16 +75,12 @@ def update_evaluation_when_add_move(move: tuple[int, int], board: [[bool | None]
     total_x_y = move[0] + move[1]
     start.append((0, total_x_y)) if total_x_y <= 6 else start.append((total_x_y - 6, 6))
 
-    # Compute streak on those 4 lines before making a move
     for i in range(len(directions)):
         count_streak_in_line(board, start[i], streak, directions[i],False)
 
-    # Reverse the value for subtraction
     streak = [-1 * i for i in streak]
-    # make a move on the board
     board[move[0]][move[1]] = turn
 
-    # Compute streak on those 4 lines after making a move
     for i in range(len(directions)):
         ended, winner = count_streak_in_line(board, start[i], streak, directions[i], False)
         if ended: return ended, winner
@@ -99,18 +93,6 @@ def calculate_evaluation(streak: [int]):
     for i in range(len(streak)):
         evaluation += streak[i] * math.pow(10, i)
     return int(evaluation)
-
-
-
-
-
-
-# sample = [[None, None, False, False, True, True, True],
-#           [None, None, True, False, True, False, True],
-#           [None, None, None, None, False, None, None],
-#           [None, None, None, None, None, None, None],
-#           [None, None, None, None, None, None, None],
-#           [None, None, None, None, None, None, None]]
 
 
 

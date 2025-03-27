@@ -86,7 +86,6 @@ class Tree:
         if node.is_terminal_node():
             return
 
-        board = self.board.get_board()
         moves = self.board.get_next_moves()
         for move in moves:
             child = self.board.perform_next_move(move, node)

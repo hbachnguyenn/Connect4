@@ -12,7 +12,8 @@ class Tree:
         self.max_depth = max_depth
         self.nodes_examined = 1
         self.root = self.initialize_root()
-
+        self.board.display_board()
+        print(score.evaluate_initial_board(self.board.board))
 
     def initialize_root(self):
         result = score.evaluate_initial_board(self.board.board)
@@ -21,32 +22,28 @@ class Tree:
         if not result[0]: evaluation = score.calculate_evaluation(result[1])
         return Node(evaluation, self.turn, 0)
 
-    def minimax(self, node, depth, max_depth, turn) -> Node:
-        if node.is_terminated() or depth == max_depth:
+    def minimax(self, node, turn) -> Node | None:
+        self.nodes_examined += 1
+        if node.is_terminal_node() or node.is_leaf_node():
+            node.set_value(node.evaluation)
             return node
 
-        if not node.get_children():
-            return node
+        for child in node.get_children():
+            if child.get_value() == float("inf") or child.get_value() == float("-inf"):
+                self.minimax(child, not turn)
 
-        child_node = [self.minimax(child, depth + 1, max_depth, not turn) for child in node.children]
+            if node.get_turn() and child.get_value() > node.get_value():
+                node.set_value(child.get_value())
+                node.set_selected_child(child)
+            if not node.get_turn() and child.get_value() < node.get_value():
+                node.set_value(child.get_value())
+                node.set_selected_child(child)
 
-        self.nodes_examined += len(child_node)
-        selected_node = child_node[0]
-        return_col = 0
-        for i in range(len(child_node)):
-            c_node = child_node[i]
-            if turn:
-                if selected_node.get_evaluation() < c_node.get_evaluation():
-                    selected_node = c_node
-                    return_col = i
-            else:
-                if selected_node.get_evaluation() > c_node.get_evaluation():
-                    selected_node = c_node
-                    return_col = i
-        if depth == 0:
-            selected_node.col = return_col
+        if node == self.root:
+            return node.get_selected_child()
 
-        return selected_node
+        return None
+
 
     def generate_state_space(self):
         self.expand_tree(self.root, 0)
@@ -55,7 +52,7 @@ class Tree:
         if depth == self.max_depth:
             return
 
-        if node.is_terminated():
+        if node.is_terminal_node():
             return
 
         # get board for evaluation

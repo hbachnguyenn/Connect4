@@ -10,10 +10,8 @@ class Tree:
         self.turn = True if turn == 'red' else False
         self.board = Board(contents)
         self.max_depth = max_depth
-        self.nodes_examined = 1
+        self.nodes_examined = 0
         self.root = self.initialize_root()
-        self.board.display_board()
-        print(score.evaluate_initial_board(self.board.board))
 
     def initialize_root(self):
         result = score.evaluate_initial_board(self.board.board)
@@ -31,7 +29,6 @@ class Tree:
         for child in node.get_children():
             if child.get_value() == float("inf") or child.get_value() == float("-inf"):
                 self.minimax(child, not turn)
-
             if node.get_turn() and child.get_value() > node.get_value():
                 node.set_value(child.get_value())
                 node.set_selected_child(child)
@@ -44,7 +41,6 @@ class Tree:
 
         return None
 
-
     def generate_state_space(self):
         self.expand_tree(self.root, 0)
 
@@ -55,7 +51,6 @@ class Tree:
         if node.is_terminal_node():
             return
 
-        # get board for evaluation
         board = self.board.get_board()
         moves = self.board.get_next_moves()
         for move in moves:

@@ -3,7 +3,6 @@ from utils.tree import Tree
 def connect_four_mm(contents, turn, max_depth):
     tree = Tree(contents, turn, max_depth)
     tree.generate_state_space()
-    tree.display_tree(tree.root)
     e = tree.minimax(tree.root, tree.root.turn)
     return f"{e.get_col()}\n{tree.nodes_examined}"
 

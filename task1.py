@@ -7,6 +7,4 @@ def connect_four_mm(contents, turn, max_depth):
     return f"{e.get_col()}\n{tree.nodes_examined}"
 
 if __name__ == '__main__':
-    result = connect_four_mm("yyyrrry,rryyyry,yrryryr,yyyrrry,rryyyry,yr..ryr", "red", 2)
-    print('\nResult:')
-    print(result)
+    result = connect_four_mm("yyyrrry,rryyyry,yrryryr,yyyrrry,rryyy..,....r..", "red", 6)

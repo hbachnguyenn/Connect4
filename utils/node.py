@@ -1,20 +1,12 @@
 class Node:
     def __init__(self, evaluation: int, turn: bool, col: int):
-        self.value = - float("inf") if turn else float("inf")
-        self.alpha = - float("inf")
-        self.beta = float("inf")
+        self.value = float("-inf") if turn else float("inf")
         self.selected_child = None
 
         self.evaluation = evaluation
         self.turn = turn
         self.col = col
         self.children = []
-
-    def set_alpha(self, alpha: int) -> None:
-        self.alpha = alpha
-
-    def set_beta(self, beta: int) -> None:
-        self.beta = beta
 
     def set_value(self, value: int) -> None:
         self.value = value
@@ -24,12 +16,6 @@ class Node:
 
     def add_child(self, child: "Node"):
         self.children.append(child)
-
-    def get_alpha(self) -> float | int:
-        return self.alpha
-
-    def get_beta(self) -> float | int:
-        return self.beta
 
     def get_value(self) -> float | int:
         return self.value

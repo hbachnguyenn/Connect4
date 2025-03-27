@@ -21,25 +21,60 @@ class Tree:
         return Node(evaluation, self.turn, 0)
 
     def minimax(self, node, turn) -> Node | None:
-        self.nodes_examined += 1
         if node.is_terminal_node() or node.is_leaf_node():
             node.set_value(node.evaluation)
-            return node
+            return None
 
         for child in node.get_children():
+            self.nodes_examined += 1
             if child.get_value() == float("inf") or child.get_value() == float("-inf"):
                 self.minimax(child, not turn)
+
             if node.get_turn() and child.get_value() > node.get_value():
                 node.set_value(child.get_value())
-                node.set_selected_child(child)
+                if node == self.root:
+                    node.set_selected_child(child)
+
             if not node.get_turn() and child.get_value() < node.get_value():
                 node.set_value(child.get_value())
-                node.set_selected_child(child)
+                if node == self.root:
+                    node.set_selected_child(child)
 
         if node == self.root:
+            self.nodes_examined += 1
             return node.get_selected_child()
 
-        return None
+    def minimax_ab(self, node, turn, alpha=float("-inf"), beta=float("inf")) -> Node | None:
+        if node.is_terminal_node() or node.is_leaf_node():
+            node.set_value(node.evaluation)
+            return None
+
+        for child in node.get_children():
+            self.nodes_examined += 1
+            if child.get_value() == float("inf") or child.get_value() == float("-inf"):
+                self.minimax_ab(child, not turn, alpha, beta)
+
+            if node.get_turn():
+                if child.get_value() > node.get_value():
+                    node.set_value(child.get_value())
+                    if node == self.root:
+                        node.set_selected_child(child)
+                alpha = max(alpha, node.get_value())
+                if beta <= alpha:
+                    break
+            else:
+                if child.get_value() < node.get_value():
+                    node.set_value(child.get_value())
+                    if node == self.root:
+                        node.set_selected_child(child)
+
+                beta = min(beta, node.get_value())
+                if beta <= alpha:
+                    break
+
+        if node == self.root:
+            self.nodes_examined += 1
+            return node.get_selected_child()
 
     def generate_state_space(self):
         self.expand_tree(self.root, 0)
